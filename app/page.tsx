@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "./_components/productCard/ProductCard";
-import { Product } from "./productItem/ProductItem";
+import { Product } from "./types/ProductItem";
 
 export default async function Home() {
   let response = await fetch(
