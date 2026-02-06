@@ -21,7 +21,7 @@ export default function Button({product}:{product:string}) {
     <>
       <CardFooter className="flex justify-between">
         <button onClick={()=>{
-            cartServices(product)
+            addProductToCart(product)
         }} className="w-auto bg-green-600 mt-2 text-white p-2 rounded hover:bg-green-700 ">Add card</button>
         <svg
           xmlns="http://www.w3.org/2000/svg"

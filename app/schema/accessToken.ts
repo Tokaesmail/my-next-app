@@ -11,4 +11,5 @@ export async function accessToken() {
     if(!Token){
         throw new Error('User not authenticated');
     }
+    return decodedToken.token as string;
 }
