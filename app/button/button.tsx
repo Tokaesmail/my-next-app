@@ -7,9 +7,8 @@ import toast from 'react-hot-toast';
 
 export default function Button({product}:{product:string}) {
   const {error,isError,isPending,mutate:addProductToCart,data} =useMutation({
-    mutationFn:async (productId: string) => {
-      return await cartServices(productId, 1);
-    },
+    mutationFn:cartServices,
+    
     onSuccess(data) {
       toast.success(data.message)
     },
