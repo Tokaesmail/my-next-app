@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { ProductCard } from "./_components/productCard/ProductCard";
 import { Product } from "./types/ProductItem";
 
@@ -16,7 +15,7 @@ export default async function Home() {
   return (
     <>
       <div className="grid grid-cols-1 mt-5 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-        {allproducts.map((prod) => (
+        {allproducts?.map((prod) => (
           <ProductCard key={prod._id} prod={prod} />
         ))}
       </div>

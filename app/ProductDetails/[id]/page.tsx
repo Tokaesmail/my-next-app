@@ -1,6 +1,5 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
@@ -11,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Product } from "../../types/ProductItem";
 import Image from "next/image";
+import AddToCartButton from "@/app/button/button";
 
 type MyProps = {
   params: {
@@ -57,7 +57,7 @@ export default async function ProductDetails(props: MyProps) {
               </span>
             </div>
 
-            <CardTitle className="text-2xl font-bold text-sky-600">
+            <CardTitle className="text-2xl font-bold text-green-600 hover:text-green-700">
               {SingleProduct.title}
             </CardTitle>
 
@@ -99,14 +99,14 @@ export default async function ProductDetails(props: MyProps) {
               </div>
             </div>
           </CardHeader>
-
-          <CardFooter className="flex justify-center mt-6">
-            <Button className="w-full md:w-1/2 bg-sky-500 hover:bg-sky-600 text-white text-lg py-2 rounded-lg">
-              Add to Cart
-            </Button>
-          </CardFooter>
+          <AddToCartButton
+          product={SingleProduct._id}/> 
         </div>
+
       </div>
     </>
-  );
-}
+    );
+
+    }
+  
+

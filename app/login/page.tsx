@@ -9,8 +9,12 @@ import { schemaRegister } from '../schema/SchemaRegister'
 import { schemaSignin } from '../schema/SchemaSignin'
 import { signIn } from 'next-auth/react'
 import toast from 'react-hot-toast'
+import { useSearchParams } from 'next/navigation'
 
 export default function Login() {
+  const searchParams=useSearchParams();
+  const callbackUrl=searchParams.get('callbackUrl')||'/';
+  
   const form = useForm({
       defaultValues: {
       email:'',
@@ -24,7 +28,7 @@ export default function Login() {
       const response=await signIn('credentials', {
         email: data.email,
         password: data.password,
-        callbackUrl: '/', 
+        callbackUrl: callbackUrl, 
         redirect: false
       }) 
       
