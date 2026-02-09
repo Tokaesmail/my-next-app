@@ -6,17 +6,18 @@ import { ProductCard } from '../_components/productCard/ProductCard';
 import toast from 'react-hot-toast';
 
 export default function Button({product}:{product:string}) {
-  const {error,isError,isPending,mutate:addProductToCart,data} =useMutation({
+  const {error,isError,isPending,mutate:addProductToCart,data:dataitems} =useMutation({
     mutationFn:cartServices,
     
     onSuccess(data) {
-      toast.success(data.message)
+      toast.success(data?.message)
     },
     onError(data){
       toast.error('login first')
     }
   })
-  console.log(data)
+  console.log(dataitems);
+  
   return (
     <>
       <CardFooter className="flex justify-between">

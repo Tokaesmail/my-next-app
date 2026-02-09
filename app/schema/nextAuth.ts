@@ -45,7 +45,7 @@ providers: [
 callbacks:{
       jwt:({token, user})=>{
         if(user){
-          user.token = user.user
+          token.user = user.user
         token.token = user.token
         }
         return token

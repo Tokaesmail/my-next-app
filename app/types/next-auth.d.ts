@@ -8,10 +8,18 @@ declare module "next-auth" {
     }
 
     interface Session {
-        user: Userinfo
+        user: Userinfo &{
+          cart?: number
+        }
   }
 }
 
+interface Userinfo {
+    name: string
+    email: string
+    role: string
+    cart?: number 
+}
 import { JWT } from "next-auth/jwt"
 
 declare module "next-auth/jwt" {
@@ -19,5 +27,6 @@ declare module "next-auth/jwt" {
   interface JWT extends User  {
     /** OpenID ID Token */
     idToken?: string
+    cart?: number
   }
 }

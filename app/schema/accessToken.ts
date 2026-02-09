@@ -2,13 +2,13 @@ import { decode } from "next-auth/jwt";
 import { cookies } from "next/headers";
 
 export async function accessToken() {
-    const authToken=(await (cookies())).get('next-auth.session-token')?.value||'';
-    const Token=await decode({
+    const authToken=(await (cookies())).get('next-auth.session-token')?.value!;
+    const decodedToken=await decode({
         token:authToken,
-        secret:process.env.NEXTAUTH_SECRET||'',
+        secret:process.env.NEXTAUTH_SECRET!,
     })
 
-    if(!Token){
+    if(!decodedToken){
         throw new Error('User not authenticated');
     }
     return decodedToken.token as string;

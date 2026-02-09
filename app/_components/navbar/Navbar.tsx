@@ -10,6 +10,8 @@ import { FaTiktok, FaYoutube } from 'react-icons/fa6';
 
 export default function Navbar() {
   const { data: session, status } = useSession();
+  console.log(session);
+  
   const [isToggle, setIsToggle] = useState(false);
   const pathname = usePathname();
 
@@ -94,9 +96,7 @@ export default function Navbar() {
             ))}
           </ul>
 
-          {/* Right Side: Social Icons + Auth/User */}
           <ul className="flex flex-row justify-end items-center gap-6 w-full">
-            {/* Social Icons - تظهر في Desktop فقط */}
             <li className="flex gap-3">
               {icons.map((ele) => (
                 <Link
@@ -120,12 +120,12 @@ export default function Navbar() {
             ) : status === 'authenticated' ? (
               <>
                 <li>
-                  <Link href="/cart" className="flex items-center gap-2 hover:text-fg-brand transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                  <Link href="/cart" className="relative flex items-center hover:text-fg-brand transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                     </svg>
-                    {session?.user?.cart && (
-                      <span className="bg-red-500 text-white rounded-full px-2 py-0.5 text-xs">
+                    {session?.user?.cart && session.user.cart > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                         {session.user.cart}
                       </span>
                     )}
@@ -182,7 +182,6 @@ export default function Navbar() {
               ))}
             </ul>
 
-            {/* Cart Icon + Logout (للمستخدمين المسجلين) */}
             {status === 'loading' ? (
               <div className="animate-pulse bg-gray-400 h-8 w-32 rounded"></div>
             ) : status === 'authenticated' ? (
@@ -190,18 +189,20 @@ export default function Navbar() {
                 {/* Cart */}
                 <Link 
                   href="/cart" 
-                  className="flex items-center gap-3 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  className="relative flex items-center gap-3 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                   onClick={() => setIsToggle(false)}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                  </svg>
+                  <div className="relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                    </svg>
+                    {session?.user?.cart && session.user.cart > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                        {session?.user?.cart}
+                      </span>
+                    )}
+                  </div>
                   <span className="text-heading">Cart</span>
-                  {session?.user?.cart && (
-                    <span className="bg-red-500 text-white rounded-full px-2 py-0.5 text-xs ml-auto">
-                      {session.user.cart}
-                    </span>
-                  )}
                 </Link>
 
                 {/* User Name */}

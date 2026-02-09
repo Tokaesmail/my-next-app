@@ -13,4 +13,5 @@ export interface Userinfo   {
     name: string
     email: string
     role: string
+    cart?:number
 }

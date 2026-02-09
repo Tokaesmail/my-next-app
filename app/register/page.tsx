@@ -7,7 +7,6 @@ import { Controller, useForm } from 'react-hook-form'
 import zod from 'zod'
 import { schemaRegister } from '../schema/SchemaRegister'
 import { toast } from 'react-hot-toast'
-// احذف سطر import { console } من هنا تماماً
 
 export default function Register() {
   const form = useForm({
@@ -22,7 +21,6 @@ export default function Register() {
     mode: 'onBlur'
   })
 
-  // أضفنا async هنا
   async function register(data: zod.infer<typeof schemaRegister>) {
     try {
       const res = await fetch('https://ecommerce.routemisr.com/api/v1/auth/signup', {
@@ -138,7 +136,7 @@ export default function Register() {
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel className='text-[#72beba] mt-4' htmlFor={field.name}>Phone : </FieldLabel>
               <Input 
-                type='tel' // يفضل استخدام tel بدل number لأرقام الهواتف
+                type='tel' 
                 {...field}
                 value={field.value ?? ''}
                 id={field.name}
