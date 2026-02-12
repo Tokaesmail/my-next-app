@@ -7,13 +7,24 @@ import { useState } from 'react';
 import logo from '../../../assets/images/freshcart-logo.svg';
 import { CiFacebook, CiInstagram, CiLinkedin, CiTwitter } from "react-icons/ci";
 import { FaTiktok, FaYoutube } from 'react-icons/fa6';
+import { useQuery } from '@tanstack/react-query';
+import { getLoggedUserCart } from '@/app/services/cart/get-cart';
 
 export default function Navbar() {
   const { data: session, status } = useSession();
+  const token = (session as any)?.token;
   console.log(session);
   
   const [isToggle, setIsToggle] = useState(false);
   const pathname = usePathname();
+
+  const { data: cartData } = useQuery<any>({
+    queryKey: ['getCart',token],
+    queryFn: () => getLoggedUserCart(token),
+    enabled: status === 'authenticated',   
+  });
+
+  const cartCount = cartData?.numOfCartItems || 0;
 
   function handleToggle() {
     setIsToggle(!isToggle);
@@ -36,7 +47,6 @@ export default function Navbar() {
 
   const Path = [
     { path: '/', Content: 'Home' },
-    { path: '/cart', Content: 'Cart' },
     { path: '/product', Content: 'Product' },
     { path: '/category', Content: 'Category' },
     { path: '/brand', Content: 'Brand' },
@@ -48,7 +58,8 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="bg-gray-200 sticky top-0 z-50 shadow-md ">
+    <>
+       <nav className="bg-gray-200 sticky top-0 z-50 shadow-md ">
       <div className="max-w-7xl flex flex-wrap lg:flex-nowrap gap-4 items-center justify-between mx-auto p-4">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
@@ -82,19 +93,25 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center justify-between w-full">
           {/* Main Navigation Links */}
           <ul className="flex flex-row justify-center items-center gap-6 w-full">
-            {Path.map((ele) => (
-              <li key={ele.Content}>
-                <Link
-                  href={ele.path}
-                  className={`block text-heading rounded hover:bg-transparent border-0 hover:text-fg-brand p-0 transition-colors ${
-                    pathname === ele.path ? 'text-fg-brand font-semibold' : ''
-                  }`}
-                >
-                  {ele.Content}
-                </Link>
-              </li>
-            ))}
-          </ul>
+  {Path.map((ele) => {
+    const isActive = pathname === ele.path;
+
+    return (
+      <li key={ele.Content}>
+        <Link
+          href={ele.path}
+          className={`block rounded border-0 p-0 transition-colors 
+            ${isActive 
+              ? 'text-green-500 font-semibold' 
+              : 'text-heading hover:text-fg-brand hover:bg-transparent' 
+            }`}
+        >
+          {ele.Content}
+        </Link>
+      </li>
+    );
+  })}
+</ul>
 
           <ul className="flex flex-row justify-end items-center gap-6 w-full">
             <li className="flex gap-3">
@@ -124,9 +141,10 @@ export default function Navbar() {
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                     </svg>
-                    {session?.user?.cart && session.user.cart > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                        {session.user.cart}
+                    
+                    {cartCount > 0 && (
+                      <span className="absolute bottom-3 left-2 bg-green-600 text-white w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold shadow-sm">
+                        {cartCount}
                       </span>
                     )}
                   </Link>
@@ -244,5 +262,6 @@ export default function Navbar() {
         )}
       </div>
     </nav>
+    </>
   );
 }

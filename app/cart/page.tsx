@@ -1,8 +1,18 @@
+'use client'
+import { useQuery } from '@tanstack/react-query'
 import Image from 'next/image'
-import React from 'react'
+import React, { use } from 'react'
 import { MdDelete } from 'react-icons/md'
 
 export default function Cart() {
+  useQuery({
+    queryKey:['get-cart'],
+    queryFn:async()=>{
+      const resp=await fetch('./api/cart ')
+      const payload= await resp.json()
+      return payload
+    }
+  })
   return (
     <>
     <div className="container mx-auto px-4 py-8 max-w-7xl">

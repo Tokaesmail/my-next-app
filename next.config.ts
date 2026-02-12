@@ -8,19 +8,9 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'ecommerce.routemisr.com',
-        pathname: '/Route-Academy-products/**',
+        pathname: '/**', 
       },
     ],
-  },
-  async redirects() {
-    return [
-      {
-        source: '/category',
-        destination: '/category/web',
-        permanent: true,
-      },
-      
-    ]
   },
 };
 

@@ -7,6 +7,8 @@ import { Controller, useForm } from 'react-hook-form'
 import zod from 'zod'
 import { schemaRegister } from '../schema/SchemaRegister'
 import { toast } from 'react-hot-toast'
+import Image from 'next/image'
+import background from '../../assets/images/trees.jpg'
 
 export default function Register() {
   const form = useForm({
@@ -25,132 +27,161 @@ export default function Register() {
     try {
       const res = await fetch('https://ecommerce.routemisr.com/api/v1/auth/signup', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
-      });
+      })
 
-      const responseData = await res.json();
-      console.log(responseData);
-      
+      const responseData = await res.json()
+      console.log(responseData)
 
       if (res.ok) {
-        toast.success('Account created successfully!');
-        form.reset();
+        toast.success('Account created successfully!')
+        form.reset()
       } else {
-        toast.error(responseData.message || 'Registration failed');
+        toast.error(responseData.message || 'Registration failed')
       }
     } catch (error) {
-      console.error('Registration Error:', error);
-      toast.error('Something went wrong. Please try again.');
+      console.error('Registration Error:', error)
+      toast.error('Something went wrong. Please try again.')
     }
   }
 
   return (
-    <div className='rounded-2xl p-3 flex flex-col bg-gray-200 w-1/2 mx-auto mt-10 '>
-      <h1 className='text-3xl text-center mb-2 text-[#72beba]'>Register Now</h1>
-      <form onSubmit={form.handleSubmit(register)}>
-        
-        {/* Name Field */}
-        <Controller
-          name="name"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel className='text-[#72beba]' htmlFor={field.name}>Name : </FieldLabel>
-              <Input 
-                {...field}
-                value={field.value ?? ''}
-                id={field.name}
-                placeholder="Enter your name"
-                autoComplete="off"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+    <div className="relative min-h-screen w-full flex items-center justify-center">
+      <Image
+        src={background}
+        alt="background"
+        fill
+        className="object-cover absolute inset-0 z-0"
+        priority
+      />
 
-        {/* Email Field */}
-        <Controller
-          name="email"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel className='text-[#72beba] mt-4' htmlFor={field.name}>Email : </FieldLabel>
-              <Input 
-                type='email'
-                {...field}
-                value={field.value ?? ''}
-                id={field.name}
-                placeholder="Enter your email"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+      <div className="absolute inset-0 bg-black/40 z-0"></div>
 
-        {/* Password Field */}
-        <Controller
-          name="password"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel className='text-[#72beba] mt-4' htmlFor={field.name}>Password : </FieldLabel>
-              <Input 
-                type='password'
-                {...field}
-                value={field.value ?? ''}
-                id={field.name}
-                placeholder="Enter your password"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+      <div className="relative z-10 w-full max-w-lg bg-white/20 backdrop-blur-md rounded-2xl p-8 shadow-lg">
+        <h1 className="text-3xl text-center mb-6 text-green-500 font-semibold">
+          Register Now
+        </h1>
 
-        {/* rePassword Field */}
-        <Controller
-          name="rePassword"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel className='text-[#72beba] mt-4' htmlFor={field.name}>Re-enter Password : </FieldLabel>
-              <Input 
-                type='password'
-                {...field}
-                value={field.value ?? ''}
-                id={field.name}
-                placeholder="Re-enter your password"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+        <form onSubmit={form.handleSubmit(register)}>
+          {/* Name */}
+          <Controller
+            name="name"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel className="text-green-500" htmlFor={field.name}>
+                  Name:
+                </FieldLabel>
+                <Input
+                  {...field}
+                  value={field.value ?? ''}
+                  id={field.name}
+                  placeholder="Enter your name"
+                  autoComplete="off"
+                  className="mt-1"
+                />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
 
-        {/* Phone Field */}
-        <Controller
-          name="phone"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel className='text-[#72beba] mt-4' htmlFor={field.name}>Phone : </FieldLabel>
-              <Input 
-                type='tel' 
-                {...field}
-                value={field.value ?? ''}
-                id={field.name}
-                placeholder="Enter your phone number"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+          {/* Email */}
+          <Controller
+            name="email"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel className="text-green-500 mt-4" htmlFor={field.name}>
+                  Email:
+                </FieldLabel>
+                <Input
+                  type="email"
+                  {...field}
+                  value={field.value ?? ''}
+                  id={field.name}
+                  placeholder="Enter your email"
+                  className="mt-1"
+                />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
 
-        <button type="submit" className="mt-10 bg-[#72beba] text-white w-full px-4 py-2 rounded-md hover:bg-[#5da3a0] transition-colors">
-          Register
-        </button>
-      </form>
+          {/* Password */}
+          <Controller
+            name="password"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel className="text-green-500 mt-4" htmlFor={field.name}>
+                  Password:
+                </FieldLabel>
+                <Input
+                  type="password"
+                  {...field}
+                  value={field.value ?? ''}
+                  id={field.name}
+                  placeholder="Enter your password"
+                  className="mt-1"
+                />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+
+          {/* Re-Password */}
+          <Controller
+            name="rePassword"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel className="text-green-500 mt-4" htmlFor={field.name}>
+                  Re-enter Password:
+                </FieldLabel>
+                <Input
+                  type="password"
+                  {...field}
+                  value={field.value ?? ''}
+                  id={field.name}
+                  placeholder="Re-enter your password"
+                  className="mt-1"
+                />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+
+          {/* Phone */}
+          <Controller
+            name="phone"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel className="text-green-500 mt-4" htmlFor={field.name}>
+                  Phone:
+                </FieldLabel>
+                <Input
+                  type="tel"
+                  {...field}
+                  value={field.value ?? ''}
+                  id={field.name}
+                  placeholder="Enter your phone number"
+                  className="mt-1"
+                />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+
+          <button
+            type="submit"
+            className="mt-8 bg-green-500 text-white w-full px-4 py-2 rounded-md hover:bg-[#5da3a0] transition"
+          >
+            Register
+          </button>
+        </form>
+      </div>
     </div>
   )
 }

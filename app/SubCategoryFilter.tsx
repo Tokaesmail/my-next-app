@@ -1,9 +1,9 @@
 import React from 'react'
 
-export default function Web() {
+export default function SubCategoryFilter() {
   return (
     <div>
-      web
+      
     </div>
   )
 }

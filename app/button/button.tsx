@@ -1,16 +1,19 @@
 'use client'
 import { CardFooter } from '@/components/ui/card';
 import { cartServices } from '../services/cart/cart-servecis';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation , useQueryClient } from '@tanstack/react-query';
 import { ProductCard } from '../_components/productCard/ProductCard';
 import toast from 'react-hot-toast';
 
 export default function Button({product}:{product:string}) {
-  const {error,isError,isPending,mutate:addProductToCart,data:dataitems} =useMutation({
+  const queryClient = useQueryClient();
+  
+  const {mutate:addProductToCart,data:dataitems} =useMutation({
     mutationFn:cartServices,
     
     onSuccess(data) {
       toast.success(data?.message)
+      queryClient.invalidateQueries({ queryKey: ['getCart'] });
     },
     onError(data){
       toast.error('login first')
