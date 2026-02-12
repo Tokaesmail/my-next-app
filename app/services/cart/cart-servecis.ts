@@ -1,34 +1,38 @@
 'use server'
-import { accessToken } from "@/app/schema/accessToken";
-import { decode } from "next-auth/jwt";
-import { cookies } from "next/headers";
 
-export async function cartServices(productId:string, quantity:number =1) {
-    try{
-    
-    const token=await accessToken()
+export async function cartServices(productId: string, userToken: string) {
+    try {
+        if (!userToken) {
+            return {
+                status: 'fail',
+                message: 'Please login first'
+            };
+        }
 
-    const response= await fetch("https://ecommerce.routemisr.com/api/v2/cart", {
-        cache:'no-store',
-        method:'POST',
-        headers:{
-            'token': `${token}`,
-            'Content-Type':'application/json',
-        },
-        body:JSON.stringify({
-            productId,
-            quantity
-        }),
-    });
-    const result= await response.json();
-    console.log(result);
-    return result;
-    
+        const response = await fetch("https://ecommerce.routemisr.com/api/v1/cart", {
+            cache: 'no-store',
+            method: 'POST',
+            headers: {
+                'token': userToken,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                productId
+            }),
+        });
 
-}catch (error: any) {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('Cart Response:', result);
+        return result;
+
+    } catch (error: any) {
         console.error('Cart Service Error:', error);
         return {
-            statusMsg: 'fail',
+            status: 'fail',
             message: error.message || 'Failed to add to cart'
         };
     }
