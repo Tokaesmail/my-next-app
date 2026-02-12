@@ -11,7 +11,7 @@ export async function GET(req:NextRequest){
     }
     const rep=await fetch(`${process.env.API}/cart`,{
         headers:{
-            token:token.token,
+            token:(token as any)?.token as string || "",
             'content-type':'application/json  '
         }
     })
