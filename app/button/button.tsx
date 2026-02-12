@@ -9,7 +9,7 @@ export default function Button({product}:{product:string}) {
   const queryClient = useQueryClient();
   
   const {mutate:addProductToCart,data:dataitems} =useMutation({
-    mutationFn:cartServices,
+    mutationFn:(productId: string) => cartServices(productId),
     
     onSuccess(data) {
       toast.success(data?.message)
