@@ -43,7 +43,7 @@ providers: [
   }})
 ], 
 callbacks:{
-      jwt:({token, user})=>{
+      jwt:({token, user}: { token: any; user: any })=>{
         if(user){
           token.user = user.user
         token.token = user.token
@@ -51,8 +51,8 @@ callbacks:{
         return token
       }, 
        
-      session:({session, token})=>{
-        session.user = token.user
+      session:({session, token}: { session: any; token: any })=>{
+        session.user = token.user as any
          
         return session
      }
