@@ -13,7 +13,6 @@ import { getLoggedUserCart } from '@/app/services/cart/get-cart';
 export default function Navbar() {
   const { data: session, status } = useSession();
   const token = (session as any)?.token;
-  console.log(session);
   
   const [isToggle, setIsToggle] = useState(false);
   const pathname = usePathname();

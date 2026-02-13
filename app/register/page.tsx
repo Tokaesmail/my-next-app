@@ -9,6 +9,8 @@ import { schemaRegister } from '../schema/SchemaRegister'
 import { toast } from 'react-hot-toast'
 import Image from 'next/image'
 import background from '../../assets/images/trees.jpg'
+import Login from '../login/page'
+import Link from 'next/link'
 
 export default function Register() {
   const form = useForm({
@@ -176,10 +178,17 @@ export default function Register() {
 
           <button
             type="submit"
-            className="mt-8 bg-green-500 text-white w-full px-4 py-2 rounded-md hover:bg-[#5da3a0] transition"
+            className="mt-8 bg-green-500 text-white w-full px-4 py-2 rounded-md hover:bg-green-700 transition"
           >
             Register
           </button>
+          <p className="text-center mt-4 text-sm text-white">
+  Already have an account?{' '}
+  <Link href="/login" className="text-green-400 font-semibold hover:underline">
+    Login
+  </Link>
+</p>
+
         </form>
       </div>
     </div>

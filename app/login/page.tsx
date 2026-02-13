@@ -11,6 +11,7 @@ import toast from 'react-hot-toast'
 import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import background from '../../assets/images/trees.jpg'
+import Link from 'next/link'
 
 export default function Login() {
   const searchParams = useSearchParams()
@@ -115,10 +116,19 @@ export default function Login() {
 
           <button
             type="submit"
-            className="mt-8 bg-green-500 text-white w-full px-4 py-2 rounded-md hover:bg-[#5aa9a3] transition"
+            className="mt-8 bg-green-500 text-white w-full px-4 py-2 rounded-md hover:bg-green-700 transition"
           >
             Login
           </button>
+          <div className="text-right mt-2">
+  <Link
+    href="/forgot-password"
+    className="text-sm text-green-500 hover:text-green-400 underline"
+  >
+    Forgot Password?
+  </Link>
+</div>
+
         </form>
       </div>
     </div>
