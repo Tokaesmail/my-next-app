@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import SubCategoryFilter from './SubcategoryFilter';
+import AddToCartButton from "@/app/button/button";
 
 export default async function categoriesId({
   params,
@@ -165,9 +166,9 @@ export default async function categoriesId({
               {products.map((product: any) => (
                 <div
                   key={product._id}
-                  className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+                  className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col h-full"
                 >
-                  <div className="relative h-56 overflow-hidden bg-gray-100">
+                  <div className="relative h-56 overflow-hidden bg-gray-100 flex-shrink-0">
                     <Image
                       src={product.imageCover}
                       alt={product.title}
@@ -183,14 +184,14 @@ export default async function categoriesId({
                     )}
                   </div>
 
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-green-600 transition-colors">
+                  <div className="p-4 flex flex-col flex-grow">
+                    <h3 className="font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-green-600 transition-colors min-h-[3rem]">
                       {product.title}
                     </h3>
 
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-2xl font-bold text-green-600">
+                        <span className="text-xl font-bold text-green-600">
                           {product.priceAfterDiscount || product.price} EGP
                         </span>
                         {product.priceAfterDiscount && (
@@ -215,22 +216,9 @@ export default async function categoriesId({
                       )}
                     </div>
 
-                    <button className="w-full py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                        />
-                      </svg>
-                      Add To Cart
-                    </button>
+                    <div className="mt-auto">
+                      <AddToCartButton product={product._id} />
+                    </div>
                   </div>
                 </div>
               ))}

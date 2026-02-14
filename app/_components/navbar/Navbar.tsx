@@ -1,5 +1,5 @@
 'use client'
-import { signOut, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -8,259 +8,142 @@ import logo from '../../../assets/images/freshcart-logo.svg';
 import { CiFacebook, CiInstagram, CiLinkedin, CiTwitter } from "react-icons/ci";
 import { FaTiktok, FaYoutube } from 'react-icons/fa6';
 import { useQuery } from '@tanstack/react-query';
-import { getLoggedUserCart } from '@/app/services/cart/get-cart';
+import { cartResponse } from '@/app/types/cart-interface';
+import UserMenu from '../userMenu/UserMenu';
 
 export default function Navbar() {
   const { data: session, status } = useSession();
-  const token = (session as any)?.token;
-  
-  const [isToggle, setIsToggle] = useState(false);
   const pathname = usePathname();
+  const [isToggle, setIsToggle] = useState(false);
 
-  const { data: cartData } = useQuery<any>({
-    queryKey: ['getCart',token],
-    queryFn: () => getLoggedUserCart(token),
-    enabled: status === 'authenticated',   
+  const { data: cartDta } = useQuery<cartResponse>({
+    queryKey: ['get-cart'], 
+    queryFn: async () => {
+      const resp = await fetch('/api/cart');
+      if (!resp.ok) throw new Error('Failed to fetch');
+      return await resp.json();
+    },
+    refetchInterval: 3000,
+    enabled: status === 'authenticated', 
+    refetchOnWindowFocus: true 
   });
 
-  const cartCount = cartData?.numOfCartItems || 0;
+  const cartCount = cartDta?.numOfCartItems || 0;
 
   function handleToggle() {
     setIsToggle(!isToggle);
   }
 
-  function logout() {
-    signOut({
-      callbackUrl: '/login'
-    });
-  }
-
   const icons = [
-    { icon: <CiInstagram />, link: 'https://www.instagram.com/freshcart', name: 'Instagram' },
-    { icon: <CiFacebook />, link: 'https://www.facebook.com/freshcart', name: 'Facebook' },
-    { icon: <FaTiktok />, link: 'https://www.tiktok.com/freshcart', name: 'TikTok' },
-    { icon: <CiTwitter />, link: 'https://www.twitter.com/freshcart', name: 'Twitter' },
-    { icon: <CiLinkedin />, link: 'https://www.linkedin.com/freshcart', name: 'LinkedIn' },
-    { icon: <FaYoutube />, link: 'https://www.youtube.com/freshcart', name: 'YouTube' },
+    { icon: <CiInstagram />, link: '#', name: 'Instagram' },
+    { icon: <CiFacebook />, link: '#', name: 'Facebook' },
+    { icon: <FaTiktok />, link: '#', name: 'TikTok' },
+    { icon: <CiTwitter />, link: '#', name: 'Twitter' },
+    { icon: <CiLinkedin />, link: '#', name: 'LinkedIn' },
+    { icon: <FaYoutube />, link: '#', name: 'YouTube' },
   ];
 
   const Path = [
     { path: '/', Content: 'Home' },
-    { path: '/product', Content: 'Product' },
     { path: '/category', Content: 'Category' },
     { path: '/brand', Content: 'Brand' },
   ];
 
-  const authPath = [
-    { path: '/login', Content: 'Login' },
-    { path: '/register', Content: 'Register' }
-  ];
-
   return (
-    <>
-       <nav className="bg-gray-200 sticky top-0 z-50 shadow-md ">
-      <div className="max-w-7xl flex flex-wrap lg:flex-nowrap gap-4 items-center justify-between mx-auto p-4">
+    <nav className="bg-gray-100 sticky top-0 z-50 shadow-sm border-b border-gray-200">
+      <div className="max-w-7xl flex flex-wrap lg:flex-nowrap items-center justify-between mx-auto p-4">
+        
         {/* Logo */}
-        <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-          <span className="self-center text-xl text-heading font-semibold whitespace-nowrap">
-            <Image
-              width={200}
-              height={200}
-              src={logo}
-              alt="FreshCart Logo"
-              priority
-            />
-          </span>
+        <Link href="/" className="flex items-center">
+          <Image width={160} height={40} src={logo} alt="FreshCart Logo" priority />
         </Link>
 
-        {/* Toggle Button */}
+        {/* Mobile Toggle Button */}
         <button
           onClick={handleToggle}
           type="button"
-          className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-body rounded-base lg:hidden hover:bg-neutral-secondary-soft hover:text-heading focus:outline-none focus:ring-2 focus:ring-neutral-tertiary ml-auto"
-          aria-controls="navbar-default"
-          aria-expanded={isToggle}
-          aria-label="Toggle navigation menu"
+          className="lg:hidden p-2 text-gray-500 hover:bg-gray-200 rounded-lg ml-auto"
         >
-          <span className="sr-only">Open main menu</span>
-          <svg className="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width={24} height={24} fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" strokeLinecap="round" strokeWidth={2} d="M5 7h14M5 12h14M5 17h14" />
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
 
-        {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center justify-between w-full">
-          {/* Main Navigation Links */}
-          <ul className="flex flex-row justify-center items-center gap-6 w-full">
-  {Path.map((ele) => {
-    const isActive = pathname === ele.path;
-
-    return (
-      <li key={ele.Content}>
-        <Link
-          href={ele.path}
-          className={`block rounded border-0 p-0 transition-colors 
-            ${isActive 
-              ? 'text-green-500 font-semibold' 
-              : 'text-heading hover:text-fg-brand hover:bg-transparent' 
-            }`}
-        >
-          {ele.Content}
-        </Link>
-      </li>
-    );
-  })}
-</ul>
-
-          <ul className="flex flex-row justify-end items-center gap-6 w-full">
-            <li className="flex gap-3">
-              {icons.map((ele) => (
+        {/* Desktop Content */}
+        <div className="hidden lg:flex items-center justify-between w-full ml-8">
+          {/* Main Links */}
+          <ul className="flex flex-row gap-6">
+            {Path.map((ele) => (
+              <li key={ele.Content}>
                 <Link
-                  key={ele.name}
-                  href={ele.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-lg hover:text-fg-brand transition-colors hover:scale-110"
-                  aria-label={ele.name}
+                  href={ele.path}
+                  className={`transition-colors ${pathname === ele.path ? 'text-green-600 font-bold' : 'text-gray-700 hover:text-green-500'}`}
                 >
+                  {ele.Content}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {/* Right Side: Social + Cart + UserMenu */}
+          <div className="flex items-center gap-5">
+            <div className="flex gap-3 border-r border-gray-300 pr-4">
+              {icons.map((ele) => (
+                <Link key={ele.name} href={ele.link} className="text-xl text-gray-600 hover:text-green-600">
                   {ele.icon}
                 </Link>
               ))}
-            </li>
+            </div>
 
-            {/* Cart & User Info */}
-            {status === 'loading' ? (
-              <li>
-                <div className="animate-pulse bg-gray-400 h-4 w-20 rounded"></div>
-              </li>
-            ) : status === 'authenticated' ? (
-              <>
-                <li>
-                  <Link href="/cart" className="relative flex items-center hover:text-fg-brand transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                    </svg>
-                    
-                    {cartCount > 0 && (
-                      <span className="absolute bottom-3 left-2 bg-green-600 text-white w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold shadow-sm">
-                        {cartCount}
-                      </span>
-                    )}
-                  </Link>
-                </li>
-                <li className="text-heading font-medium text-sm">
-                  Hi, {session?.user?.name || 'User'}
-                </li>
-                <li>
-                  <button
-                    onClick={logout}
-                    className="cursor-pointer text-heading hover:text-fg-brand transition-colors font-medium text-sm"
-                  >
-                    Logout
-                  </button>
-                </li>
-              </>
-            ) : (
-              <>
-                {authPath.map((ele) => (
-                  <li key={ele.Content}>
-                    <Link
-                      href={ele.path}
-                      className={`block text-heading rounded hover:bg-transparent border-0 hover:text-fg-brand p-0 transition-colors text-sm ${
-                        pathname === ele.path ? 'text-fg-brand font-semibold' : ''
-                      }`}
-                    >
-                      {ele.Content}
-                    </Link>
-                  </li>
-                ))}
-              </>
-            )}
-          </ul>
+            <div className="flex items-center gap-4">
+              {/* Cart Icon with Badge - only show when authenticated */}
+              {status === 'authenticated' && (
+                <Link href="/cart" className="relative p-2 flex items-center group">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 text-gray-700 group-hover:text-green-600 transition-colors">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                  </svg>
+                  {cartCount > 0 && (
+                    <span className="absolute top-0 right-0 bg-green-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-sm">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
+              )}
+              
+              {/* User Menu Component */}
+              <UserMenu />
+            </div>
+          </div>
         </div>
 
-        {/* Mobile/Tablet Menu */}
+        {/* Mobile Menu */}
         {isToggle && (
-          <div className="w-full lg:hidden bg-gray-200 dark:bg-gray-700 rounded-lg mt-4 p-4">
-            {/* Navigation Links */}
-            <ul className="flex flex-col gap-3 mb-4 pb-4 border-b border-gray-400">
+          <div className="w-full lg:hidden bg-white rounded-xl shadow-inner mt-4 p-4 border border-gray-100">
+            <ul className="flex flex-col gap-4">
               {Path.map((ele) => (
                 <li key={ele.Content}>
-                  <Link
-                    href={ele.path}
-                    className={`block text-heading rounded p-2 transition-colors hover:bg-gray-300 dark:hover:bg-gray-600 ${
-                      pathname === ele.path ? 'text-fg-brand font-semibold bg-gray-300 dark:bg-gray-600' : ''
-                    }`}
-                    onClick={() => setIsToggle(false)}
-                  >
+                  <Link href={ele.path} onClick={() => setIsToggle(false)} className={`block p-2 rounded ${pathname === ele.path ? 'bg-green-50 text-green-600 font-bold' : 'text-gray-700'}`}>
                     {ele.Content}
                   </Link>
                 </li>
               ))}
-            </ul>
-
-            {status === 'loading' ? (
-              <div className="animate-pulse bg-gray-400 h-8 w-32 rounded"></div>
-            ) : status === 'authenticated' ? (
-              <div className="flex flex-col gap-3">
-                {/* Cart */}
-                <Link 
-                  href="/cart" 
-                  className="relative flex items-center gap-3 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                  onClick={() => setIsToggle(false)}
-                >
-                  <div className="relative">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                    </svg>
-                    {session?.user?.cart && session.user.cart > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                        {session?.user?.cart}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-heading">Cart</span>
+              <hr />
+              
+              {/* Cart link for mobile - only when authenticated */}
+              {status === 'authenticated' && (
+                <Link href="/cart" onClick={() => setIsToggle(false)} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span className="font-medium text-gray-700">My Cart</span>
+                  <span className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold">{cartCount}</span>
                 </Link>
-
-                {/* User Name */}
-                <div className="text-heading font-medium px-2">
-                  Hi, {session?.user?.name || 'User'}
-                </div>
-
-                {/* Logout */}
-                <button
-                  onClick={() => {
-                    logout();
-                    setIsToggle(false);
-                  }}
-                  className="flex items-center gap-3 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-left text-heading"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-                  </svg>
-                  <span>Logout</span>
-                </button>
+              )}
+              
+              <div className="pt-2">
+                <UserMenu />
               </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {authPath.map((ele) => (
-                  <Link
-                    key={ele.Content}
-                    href={ele.path}
-                    className={`block text-heading rounded p-2 transition-colors hover:bg-gray-300 dark:hover:bg-gray-600 ${
-                      pathname === ele.path ? 'text-fg-brand font-semibold bg-gray-300 dark:bg-gray-600' : ''
-                    }`}
-                    onClick={() => setIsToggle(false)}
-                  >
-                    {ele.Content}
-                  </Link>
-                ))}
-              </div>
-            )}
+            </ul>
           </div>
         )}
       </div>
     </nav>
-    </>
   );
 }

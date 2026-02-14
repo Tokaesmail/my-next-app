@@ -5,7 +5,7 @@ import React from 'react';
 export default function Categorycart({ pro}:{pro:any}) {
   console.log(pro);
 
-  const { _id, name, slug , age, image } = pro;
+  const { _id, name, age, image } = pro;
 
   return (
     <>
