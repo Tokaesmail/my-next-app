@@ -12,10 +12,16 @@ import { Product } from "../../types/ProductItem";
 import Link from "next/link";
 import Image from "next/image";
 import AddToCartButton from "@/app/button/button";
+import WishlistButton from "../wishlist/WishlistButton";
+
 
 export function ProductCard({ prod }: { prod: Product }) {
   return (
     <Card className="relative mx-auto w-full max-w-sm pt-0">
+      <div className="absolute top-3 right-3 z-10">
+        <WishlistButton productId={prod._id} size="md" />
+      </div>
+
       <Link href={`/ProductDetails/${prod._id}`}>
         <Image
           width={500}

@@ -14,6 +14,8 @@ export interface cartItem  {
   updatedAt: string
   __v: number
   totalCartPrice: number
+    totalPriceAfterDiscount?: number;
+
 }
 
 export interface Product {

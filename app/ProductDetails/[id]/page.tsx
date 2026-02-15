@@ -11,6 +11,7 @@ import {
 import { Product } from "../../types/ProductItem";
 import Image from "next/image";
 import AddToCartButton from "@/app/button/button";
+import WishlistButton from "@/app/_components/wishlist/WishlistButton";
 
 type MyProps = {
   params: {
