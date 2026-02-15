@@ -9,8 +9,10 @@ import { UpdateCart } from '../services/cart/Update-cart'
 import { applyCoupon } from '../services/cart/apply-coupon'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import { useRouter } from 'next/navigation'
 
 export default function Cart() {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [couponCode, setCouponCode] = useState('');
   
@@ -98,7 +100,10 @@ export default function Cart() {
     )
   }
 
-  if (isError || !cartDta || cartDta.data.products.length === 0) {
+  // ✅ Fix: Check each level to avoid undefined errors
+  const isCartEmpty = !cartDta || !cartDta.data || !cartDta.data.products || cartDta.data.products.length === 0;
+
+  if (isError || isCartEmpty) {
     return (
       <div className="text-center py-20">
         <h2 className="text-2xl font-bold mb-4">Cart Empty</h2>
@@ -276,7 +281,10 @@ export default function Cart() {
               </div>
             </div>
 
-            <button className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold">
+            <button 
+              onClick={() => router.push('/addresses')}
+              className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold"
+            >
               Proceed to Checkout
             </button>
           </div>
