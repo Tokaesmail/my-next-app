@@ -33,12 +33,10 @@ export default function AddressSelectionClient({ addresses, preselectedId, token
     }
 
     setIsProcessing(true);
-    // Store selected address in sessionStorage for next steps
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('selectedAddressId', selectedAddress);
     }
     
-    // Navigate to step 2
     router.push('/checkout/step2-review');
   };
 
@@ -53,27 +51,25 @@ export default function AddressSelectionClient({ addresses, preselectedId, token
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 border border-gray-100"
+        className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl dark:shadow-indigo-900/20 p-6 md:p-8 border border-gray-100 dark:border-gray-800"
       >
-        {/* Header */}
         <div className="flex items-center gap-3 mb-6">
           <div className="w-12 h-12 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
             <HiLocationMarker className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Delivery Address</h2>
-            <p className="text-gray-600">Where should we deliver your order?</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">Delivery Address</h2>
+            <p className="text-gray-600 dark:text-gray-400">Where should we deliver your order?</p>
           </div>
         </div>
 
-        {/* Addresses List */}
         {addresses.length === 0 ? (
           <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <HiLocationMarker className="w-12 h-12 text-gray-400" />
+            <div className="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
+              <HiLocationMarker className="w-12 h-12 text-gray-400 dark:text-gray-600" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">No Addresses Found</h3>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">No Addresses Found</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
               You need to add a delivery address before proceeding with checkout
             </p>
             <button
@@ -97,51 +93,48 @@ export default function AddressSelectionClient({ addresses, preselectedId, token
                   className={`
                     p-6 rounded-2xl border-2 cursor-pointer transition-all duration-200
                     ${selectedAddress === address._id 
-                      ? 'border-indigo-600 bg-linear-to-br from-indigo-50 to-purple-50 shadow-xl ring-4 ring-indigo-200' 
-                      : 'border-gray-200 hover:border-indigo-300 hover:shadow-lg bg-white'
+                      ? 'border-indigo-600 dark:border-indigo-500 bg-linear-to-br from-indigo-50 to-purple-50 dark:from-indigo-950 dark:to-purple-950 shadow-xl ring-4 ring-indigo-200 dark:ring-indigo-900' 
+                      : 'border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600 hover:shadow-lg bg-white dark:bg-gray-800'
                     }
                   `}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-4 flex-1">
-                      {/* Icon */}
                       <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-md ${
                         selectedAddress === address._id 
                           ? 'bg-linear-to-br from-indigo-500 to-purple-600' 
-                          : 'bg-gray-100'
+                          : 'bg-gray-100 dark:bg-gray-700'
                       }`}>
                         {address.name.toLowerCase().includes('home') ? (
-                          <HiHome className={`w-6 h-6 ${selectedAddress === address._id ? 'text-white' : 'text-indigo-600'}`} />
+                          <HiHome className={`w-6 h-6 ${selectedAddress === address._id ? 'text-white' : 'text-indigo-600 dark:text-indigo-400'}`} />
                         ) : address.name.toLowerCase().includes('office') ? (
-                          <HiOfficeBuilding className={`w-6 h-6 ${selectedAddress === address._id ? 'text-white' : 'text-blue-600'}`} />
+                          <HiOfficeBuilding className={`w-6 h-6 ${selectedAddress === address._id ? 'text-white' : 'text-blue-600 dark:text-blue-400'}`} />
                         ) : (
-                          <HiLocationMarker className={`w-6 h-6 ${selectedAddress === address._id ? 'text-white' : 'text-purple-600'}`} />
+                          <HiLocationMarker className={`w-6 h-6 ${selectedAddress === address._id ? 'text-white' : 'text-purple-600 dark:text-purple-400'}`} />
                         )}
                       </div>
                       
-                      {/* Address Details */}
                       <div className="flex-1">
-                        <h3 className="text-xl font-bold text-gray-900 mb-3">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">
                           {address.name}
                         </h3>
-                        <div className="space-y-2 text-gray-700">
+                        <div className="space-y-2 text-gray-700 dark:text-gray-300">
                           <div className="flex items-start gap-2">
-                            <span className="font-semibold min-w-20 text-gray-900">City:</span>
+                            <span className="font-semibold min-w-20 text-gray-900 dark:text-gray-100">City:</span>
                             <span>{address.city}</span>
                           </div>
                           <div className="flex items-start gap-2">
-                            <span className="font-semibold min-w-20 text-gray-900">Phone:</span>
+                            <span className="font-semibold min-w-20 text-gray-900 dark:text-gray-100">Phone:</span>
                             <span className="font-mono">{address.phone}</span>
                           </div>
                           <div className="flex items-start gap-2">
-                            <span className="font-semibold min-w-20 text-gray-900">Address:</span>
+                            <span className="font-semibold min-w-20 text-gray-900 dark:text-gray-100">Address:</span>
                             <span className="flex-1">{address.details}</span>
                           </div>
                         </div>
                       </div>
                     </div>
                     
-                    {/* Selected Badge */}
                     {selectedAddress === address._id && (
                       <motion.div
                         initial={{ scale: 0 }}
@@ -157,10 +150,9 @@ export default function AddressSelectionClient({ addresses, preselectedId, token
               ))}
             </div>
 
-            {/* Add New Address Link */}
             <button
               onClick={handleAddNewAddress}
-              className="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl text-gray-600 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 font-semibold text-lg"
+              className="w-full py-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl text-gray-600 dark:text-gray-400 hover:border-indigo-400 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 transition-all duration-200 font-semibold text-lg"
             >
               + Add New Address
             </button>
@@ -168,7 +160,6 @@ export default function AddressSelectionClient({ addresses, preselectedId, token
         )}
       </motion.div>
 
-      {/* Continue Button */}
       {addresses.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -22,7 +22,6 @@ export default function PaymentMethodClient({ token }: Props) {
     }
 
     setIsProcessing(true);
-    // Store payment method for final confirmation
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('paymentMethod', paymentMethod);
     }
@@ -40,20 +39,18 @@ export default function PaymentMethodClient({ token }: Props) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 border border-gray-100"
+        className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl dark:shadow-pink-900/20 p-6 md:p-8 border border-gray-100 dark:border-gray-800"
       >
-        {/* Header */}
         <div className="flex items-center gap-3 mb-8">
           <div className="w-12 h-12 rounded-full bg-linear-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-lg">
             <HiCreditCard className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Payment Method</h2>
-            <p className="text-gray-600">Choose how you'd like to pay</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">Payment Method</h2>
+            <p className="text-gray-600 dark:text-gray-400">Choose how you'd like to pay</p>
           </div>
         </div>
 
-        {/* Payment Options */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           {/* Cash on Delivery */}
           <motion.div
@@ -63,25 +60,23 @@ export default function PaymentMethodClient({ token }: Props) {
             className={`
               relative p-8 rounded-2xl border-3 cursor-pointer transition-all duration-300 overflow-hidden
               ${paymentMethod === 'cash'
-                ? 'border-green-500 bg-linear-to-br from-green-50 to-emerald-50 shadow-2xl ring-4 ring-green-200'
-                : 'border-gray-200 hover:border-green-300 hover:shadow-xl bg-white'
+                ? 'border-green-500 dark:border-green-600 bg-linear-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 shadow-2xl ring-4 ring-green-200 dark:ring-green-900'
+                : 'border-gray-200 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-700 hover:shadow-xl bg-white dark:bg-gray-800'
               }
             `}
           >
-            {/* Background Pattern */}
             <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
               <HiCash className="w-full h-full text-green-600" />
             </div>
 
             <div className="relative">
-              {/* Icon & Badge */}
               <div className="flex items-start justify-between mb-6">
                 <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 ${
                   paymentMethod === 'cash' 
                     ? 'bg-linear-to-br from-green-500 to-emerald-600' 
-                    : 'bg-linear-to-br from-gray-100 to-gray-200'
+                    : 'bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800'
                 }`}>
-                  <HiCash className={`w-9 h-9 ${paymentMethod === 'cash' ? 'text-white' : 'text-green-600'}`} />
+                  <HiCash className={`w-9 h-9 ${paymentMethod === 'cash' ? 'text-white' : 'text-green-600 dark:text-green-500'}`} />
                 </div>
                 
                 {paymentMethod === 'cash' && (
@@ -95,25 +90,23 @@ export default function PaymentMethodClient({ token }: Props) {
                 )}
               </div>
 
-              {/* Content */}
-              <h3 className="text-2xl font-black text-gray-900 mb-3">
+              <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100 mb-3">
                 Cash on Delivery
               </h3>
-              <p className="text-gray-600 leading-relaxed mb-4">
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
                 Pay with cash when your order arrives at your doorstep. Simple and convenient!
               </p>
 
-              {/* Features */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-gray-700">
+                <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
                   <span>No online transaction needed</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-700">
+                <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
                   <span>Pay when you receive</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-700">
+                <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
                   <span>100% secure delivery</span>
                 </div>
@@ -129,25 +122,23 @@ export default function PaymentMethodClient({ token }: Props) {
             className={`
               relative p-8 rounded-2xl border-3 cursor-pointer transition-all duration-300 overflow-hidden
               ${paymentMethod === 'online'
-                ? 'border-blue-500 bg-linear-to-br from-blue-50 to-indigo-50 shadow-2xl ring-4 ring-blue-200'
-                : 'border-gray-200 hover:border-blue-300 hover:shadow-xl bg-white'
+                ? 'border-blue-500 dark:border-blue-600 bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 shadow-2xl ring-4 ring-blue-200 dark:ring-blue-900'
+                : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-xl bg-white dark:bg-gray-800'
               }
             `}
           >
-            {/* Background Pattern */}
             <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
               <HiCreditCard className="w-full h-full text-blue-600" />
             </div>
 
             <div className="relative">
-              {/* Icon & Badge */}
               <div className="flex items-start justify-between mb-6">
                 <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 ${
                   paymentMethod === 'online' 
                     ? 'bg-linear-to-br from-blue-500 to-indigo-600' 
-                    : 'bg-linear-to-br from-gray-100 to-gray-200'
+                    : 'bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800'
                 }`}>
-                  <HiCreditCard className={`w-9 h-9 ${paymentMethod === 'online' ? 'text-white' : 'text-blue-600'}`} />
+                  <HiCreditCard className={`w-9 h-9 ${paymentMethod === 'online' ? 'text-white' : 'text-blue-600 dark:text-blue-500'}`} />
                 </div>
                 
                 {paymentMethod === 'online' && (
@@ -161,25 +152,23 @@ export default function PaymentMethodClient({ token }: Props) {
                 )}
               </div>
 
-              {/* Content */}
-              <h3 className="text-2xl font-black text-gray-900 mb-3">
+              <h3 className="text-2xl font-black text-gray-900 dark:text-gray-100 mb-3">
                 Online Payment
               </h3>
-              <p className="text-gray-600 leading-relaxed mb-4">
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
                 Pay securely with credit/debit card or digital wallet. Fast and encrypted!
               </p>
 
-              {/* Features */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-gray-700">
+                <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
                   <span>Instant payment confirmation</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-700">
+                <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
                   <span>Secure encrypted transaction</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-700">
+                <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
                   <span>Multiple payment options</span>
                 </div>
@@ -189,16 +178,15 @@ export default function PaymentMethodClient({ token }: Props) {
         </div>
 
         {/* Security Badge */}
-        <div className="flex items-center justify-center gap-3 p-6 bg-linear-to-r from-gray-50 to-slate-50 rounded-2xl border border-gray-200">
-          <HiShieldCheck className="w-8 h-8 text-green-600" />
+        <div className="flex items-center justify-center gap-3 p-6 bg-linear-to-r from-gray-50 to-slate-50 dark:from-gray-800 dark:to-slate-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+          <HiShieldCheck className="w-8 h-8 text-green-600 dark:text-green-500" />
           <div>
-            <p className="font-bold text-gray-900">Secure Payment</p>
-            <p className="text-sm text-gray-600">Your payment information is always protected</p>
+            <p className="font-bold text-gray-900 dark:text-gray-100">Secure Payment</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Your payment information is always protected</p>
           </div>
         </div>
       </motion.div>
 
-      {/* Navigation Buttons */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -206,7 +194,7 @@ export default function PaymentMethodClient({ token }: Props) {
       >
         <button
           onClick={handleBack}
-          className="flex items-center gap-3 px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-lg transition-all bg-white border-2 border-gray-300 hover:border-gray-400 text-gray-700 shadow-md hover:shadow-lg"
+          className="flex items-center gap-3 px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold text-lg transition-all bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 text-gray-700 dark:text-gray-300 shadow-md hover:shadow-lg"
         >
           <HiArrowLeft className="w-5 h-5 md:w-6 md:h-6" />
           Back
