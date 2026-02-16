@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiHome, HiOfficeBuilding, HiLocationMarker, HiPlus, HiPencil, HiTrash, HiCheck, HiX } from 'react-icons/hi';
 import toast from 'react-hot-toast';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface Address {
   _id: string;
@@ -28,8 +28,13 @@ interface SingleAddressResponse {
 export default function UserAddressesPage() {
   const { data: session } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
   const userToken = (session as any)?.token;
+
+  // ✅ Check if coming from checkout
+  const redirectUrl = searchParams?.get('redirect');
+  const isFromCheckout = redirectUrl?.includes('checkout');
 
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -83,11 +88,16 @@ export default function UserAddressesPage() {
       if (!response.ok) throw new Error('Failed to add address');
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['user-addresses'] });
       toast.success('Address added successfully! ✅');
       setIsAddingNew(false);
       resetForm();
+      
+      // ✅ If from checkout, redirect back with new address selected
+      if (isFromCheckout && redirectUrl && data.data?._id) {
+        router.push(`${redirectUrl}?preselected=${data.data._id}`);
+      }
     },
     onError: () => {
       toast.error('Failed to add address ❌');
@@ -170,12 +180,20 @@ export default function UserAddressesPage() {
     }
   };
 
+  // ✅ UPDATED: Proceed to correct checkout page
   const handleProceedToCheckout = () => {
     if (!selectedAddress) {
       toast.error('Please select a delivery address');
       return;
     }
-    router.push(`/checkout?addressId=${selectedAddress}`);
+    
+    // ✅ If redirect URL exists (from checkout), go back there
+    if (redirectUrl) {
+      router.push(`${redirectUrl}?preselected=${selectedAddress}`);
+    } else {
+      // ✅ Otherwise, start new checkout flow
+      router.push(`/checkout/step1-address?preselected=${selectedAddress}`);
+    }
   };
 
   if (isLoading) {
@@ -192,103 +210,94 @@ export default function UserAddressesPage() {
   const addresses = addressesData?.data || [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 transition-colors duration-300">
-      <div className="container mx-auto px-4 max-w-5xl">
+    <div className="min-h-screen bg-linear-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 transition-colors duration-300">
+      <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-            <div>
-              <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-2">
-                Delivery Addresses
-                <HiLocationMarker className="inline-block ml-3 text-green-600" />
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                Manage your delivery locations ({addresses.length} {addresses.length === 1 ? 'address' : 'addresses'})
-              </p>
-            </div>
+        <div className="text-center mb-10">
+          <motion.h1 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-4xl font-black text-gray-900 dark:text-white mb-3 flex items-center justify-center gap-3"
+          >
+            <HiLocationMarker className="w-10 h-10 text-green-600" />
+            Delivery Addresses
+          </motion.h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            {isFromCheckout 
+              ? '📦 Select or add an address to continue with checkout' 
+              : `Manage your delivery locations (${addresses.length} address${addresses.length !== 1 ? 'es' : ''})`
+            }
+          </p>
+        </div>
 
-            {!editingId && (
-              <button
-                onClick={() => {
-                  setIsAddingNew(!isAddingNew);
-                  resetForm();
-                }}
-                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-200 font-semibold"
-              >
-                {isAddingNew ? (
-                  <>
-                    <HiX className="w-5 h-5" />
-                    Cancel
-                  </>
-                ) : (
-                  <>
-                    <HiPlus className="w-5 h-5" />
-                    Add New Address
-                  </>
-                )}
-              </button>
-            )}
-          </div>
-        </motion.div>
+        {/* Add New Address Button */}
+        {!isAddingNew && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mb-6"
+          >
+            <button
+              onClick={() => setIsAddingNew(true)}
+              className="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-3"
+            >
+              <HiPlus className="w-6 h-6" />
+              Add New Address
+            </button>
+          </motion.div>
+        )}
 
         {/* Add/Edit Form */}
         <AnimatePresence>
-          {(isAddingNew || editingId) && (
+          {isAddingNew && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="mb-8"
+              className="mb-6"
             >
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border-2 border-green-200 dark:border-green-900">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                    {editingId ? '✏️ Edit Address' : '➕ New Address'}
-                  </h3>
-                  {editingId && (
-                    <button
-                      onClick={() => {
-                        setEditingId(null);
-                        resetForm();
-                      }}
-                      className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                    >
-                      <HiX className="w-6 h-6" />
-                    </button>
-                  )}
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {editingId ? '✏️ Edit Address' : '➕ Add New Address'}
+                  </h2>
+                  <button
+                    onClick={() => {
+                      setIsAddingNew(false);
+                      setEditingId(null);
+                      resetForm();
+                    }}
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  >
+                    <HiX className="w-6 h-6 text-gray-500" />
+                  </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Address Name *
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="e.g., Home, Office, Parent's House"
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      />
-                    </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Address Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Home, Office, etc."
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        City *
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.city}
-                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                        placeholder="e.g., Cairo, Giza, Alexandria"
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      />
-                    </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      City *
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      placeholder="Cairo, Alexandria, etc."
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
                   </div>
 
                   <div>
@@ -471,7 +480,7 @@ export default function UserAddressesPage() {
               {selectedAddress ? (
                 <>
                   <HiCheck className="w-6 h-6" />
-                  Proceed to Checkout
+                  {isFromCheckout ? 'Continue with Selected Address' : 'Proceed to Checkout'}
                 </>
               ) : (
                 'Select an Address to Continue'

@@ -1,6 +1,7 @@
 import CredentialsProvider from "next-auth/providers/credentials"
 import { FailAuth, SuccessLogin } from "../types/authinterface"
 import { NextAuthOptions } from "next-auth"
+import { cookies } from "next/headers"
 
 export const authOptions: NextAuthOptions = {
   pages: {
@@ -32,19 +33,16 @@ export const authOptions: NextAuthOptions = {
 
           const payload: FailAuth | SuccessLogin = await res.json();
           
-          console.log('Auth Response:', payload);
-          
           if ('token' in payload) {
             return {
               id: payload.user.email,
               user: payload.user,
-              token: payload.token
+              token: payload.token 
             };
           } else {
             throw new Error(payload.message || "Invalid credentials");
           }
         } catch (error: any) {
-          console.error('Auth Error:', error);
           throw new Error(error.message || "Authentication failed");
         }
       }
@@ -62,6 +60,20 @@ export const authOptions: NextAuthOptions = {
       session.user = token.user;
       session.token = token.token; 
       return session;
+    }
+  },
+  events: {
+    async signIn({ user }: any) {
+      if (user?.token) {
+        const cookieStore = await cookies();
+        cookieStore.set('userToken', user.token, {
+          maxAge: 30 * 24 * 60 * 60,
+          path: '/',
+          httpOnly: false, 
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax'
+        });
+      }
     }
   },
   session: {

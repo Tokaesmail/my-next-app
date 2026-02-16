@@ -11,8 +11,10 @@ import Image from 'next/image'
 import background from '../../assets/images/trees.jpg'
 import Login from '../login/page'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function Register() {
+  const router = useRouter();
   const form = useForm({
     defaultValues: {
       name: '',
@@ -35,6 +37,10 @@ export default function Register() {
 
       const responseData = await res.json()
       console.log(responseData)
+
+      if (responseData.message=='success') {
+        router.push('../login/page.tsx')
+      }
 
       if (res.ok) {
         toast.success('Account created successfully!')

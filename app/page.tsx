@@ -1,3 +1,4 @@
+import CategoriesSlider from "./_components/CategoriesSlider/CategoriesSlider";
 import MainSlider from "./_components/MainSlider/MainSlider";
 import { ProductCard } from "./_components/productCard/ProductCard";
 import { Product } from "./types/ProductItem";
@@ -17,6 +18,7 @@ export default async function Home() {
   return (
     <>
     <MainSlider/>
+    <CategoriesSlider/>
       <div className="grid grid-cols-1 mt-5 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
         {allproducts?.map((prod) => (
           <ProductCard key={prod._id} prod={prod} />
