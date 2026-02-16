@@ -15,126 +15,66 @@ import Image from 'next/image';
 
 export default function MainSlider() {
   return (
-    <div className="w-full bg-gray-50 py-4 md:py-6">
+    <div className="w-full bg-gray-50 dark:bg-gray-950 py-4 md:py-6 transition-colors duration-300">
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+          
+          {/* Main Slider Section */}
           <div className="w-full lg:w-3/4">
-            <div className="relative rounded-xl overflow-hidden shadow-lg">
+            <div className="relative rounded-xl overflow-hidden shadow-lg border dark:border-gray-800 group">
               <Swiper
                 spaceBetween={0}
                 slidesPerView={1}
                 loop={true}
-                autoplay={{
-                  delay: 1000,
-                  disableOnInteraction: false,
-                }}
-                pagination={{
+                autoplay={{ delay: 1000, disableOnInteraction: false }}
+                pagination={{ 
                   clickable: true,
+                  bulletActiveClass: 'swiper-pagination-bullet-active !bg-emerald-500 !opacity-100',
                 }}
                 modules={[Autoplay, Pagination, Navigation]}
-                className="main-slider"
+                className="main-slider 
+                  [&_.swiper-button-next]:after:text-sm [&_.swiper-button-next]:after:font-bold [&_.swiper-button-next]:text-white [&_.swiper-button-next]:bg-black/40 [&_.swiper-button-next]:backdrop-blur-md [&_.swiper-button-next]:w-10 [&_.swiper-button-next]:h-10 [&_.swiper-button-next]:rounded-full [&_.swiper-button-next]:hidden sm:[&_.swiper-button-next]:flex 
+                  [&_.swiper-button-prev]:after:text-sm [&_.swiper-button-prev]:after:font-bold [&_.swiper-button-prev]:text-white [&_.swiper-button-prev]:bg-black/40 [&_.swiper-button-prev]:backdrop-blur-md [&_.swiper-button-prev]:w-10 [&_.swiper-button-prev]:h-10 [&_.swiper-button-prev]:rounded-full [&_.swiper-button-prev]:hidden sm:[&_.swiper-button-prev]:flex 
+                  [&_.swiper-pagination-bullet]:bg-white [&_.swiper-pagination-bullet]:opacity-60"
               >
-                <SwiperSlide>
-                  <div className="relative w-full h-62.5 sm:h-87.5 md:h-112.5 lg:h-112.5">
-                    <Image
-                      src={img3}
-                      alt="Slider Image 1"
-                      fill
-                      className="object-cover"
-                      priority
-                    />
-                  </div>
-                </SwiperSlide>
-                <SwiperSlide>
-                  <div className="relative w-full h-62.5 sm:h-87.5 md:h-112.5 lg:h-112.5">
-                    <Image
-                      src={img4}
-                      alt="Slider Image 2"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                </SwiperSlide>
-                <SwiperSlide>
-                  <div className="relative w-full h-62.5 sm:h-87.5 md:h-112.5 lg:h-112.5">
-                    <Image
-                      src={img5}
-                      alt="Slider Image 3"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                </SwiperSlide>
+                {[img3, img4, img5].map((img, index) => (
+                  <SwiperSlide key={index}>
+                    <div className="relative w-full h-62.5 sm:h-87.5 md:h-112.5 lg:h-112.5">
+                      <Image 
+                        src={img} 
+                        alt={`Slider Image ${index + 1}`} 
+                        fill 
+                        className="object-cover" 
+                        priority={index === 0} 
+                      />
+                    </div>
+                  </SwiperSlide>
+                ))}
               </Swiper>
             </div>
           </div>
 
+          {/* Side Images Section */}
           <div className="w-full lg:w-1/4">
             <div className="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:gap-6">
-              {/* Image 1 */}
-              <div className="relative rounded-xl overflow-hidden shadow-lg h-37.5 sm:h-50 lg:h-61.25">
-                <Image
-                  src={img1}
-                  alt="Blog Image 1"
-                  fill
-                  className="object-cover hover:scale-110 transition-transform duration-300"
-                />
-              </div>
-
-              {/* Image 2 */}
-              <div className="relative rounded-xl overflow-hidden shadow-lg h-37.5 sm:h-50 lg:h-61.25">
-                <Image
-                  src={img2}
-                  alt="Blog Image 2"
-                  fill
-                  className="object-cover hover:scale-110 transition-transform duration-300"
-                />
-              </div>
+              {[img1, img2].map((img, index) => (
+                <div 
+                  key={index} 
+                  className="relative rounded-xl overflow-hidden shadow-lg border dark:border-gray-800 h-37.5 sm:h-50 lg:h-53.25"
+                >
+                  <Image 
+                    src={img} 
+                    alt={`Blog Image ${index + 1}`} 
+                    fill 
+                    className="object-cover hover:scale-110 transition-transform duration-500" 
+                  />
+                </div>
+              ))}
             </div>
           </div>
+
         </div>
       </div>
-
-      <style jsx global>{`
-        .main-slider .swiper-button-next,
-        .main-slider .swiper-button-prev {
-          color: white;
-          background: rgba(0, 0, 0, 0.3);
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          backdrop-filter: blur(4px);
-        }
-
-        .main-slider .swiper-button-next:after,
-        .main-slider .swiper-button-prev:after {
-          font-size: 16px;
-          font-weight: bold;
-        }
-
-        .main-slider .swiper-button-next:hover,
-        .main-slider .swiper-button-prev:hover {
-          background: rgba(0, 0, 0, 0.5);
-        }
-
-        .main-slider .swiper-pagination-bullet {
-          background: white;
-          opacity: 0.6;
-        }
-
-        .main-slider .swiper-pagination-bullet-active {
-          background: white;
-          opacity: 1;
-        }
-
-        /* Hide navigation arrows on mobile */
-        @media (max-width: 640px) {
-          .main-slider .swiper-button-next,
-          .main-slider .swiper-button-prev {
-            display: none;
-          }
-        }
-      `}</style>
     </div>
   )
 }

@@ -29,20 +29,20 @@ export default function SubCategoryFilter({
   const router = useRouter();
   const pathname = usePathname();
 
-  // تغيير الفلتر
   const handleFilterChange = (subCategoryId: string | null) => {
     if (subCategoryId) {
       router.push(`${pathname}?subcategory=${subCategoryId}`);
     } else {
-      router.push(pathname); // إزالة الفلتر
+      router.push(pathname);
     }
   };
 
   return (
-    <div className="bg-white border-b sticky top-0 z-10 shadow-sm">
+    // bg-white -> dark:bg-gray-900 | border-b -> dark:border-gray-800
+    <div className="bg-white dark:bg-gray-950 border-b dark:border-gray-800 sticky top-0 z-10 shadow-sm transition-colors duration-300">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          <span className="text-sm font-semibold text-gray-700 mr-2 whitespace-nowrap">
+          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 mr-2 whitespace-nowrap">
             Filter by:
           </span>
 
@@ -52,7 +52,8 @@ export default function SubCategoryFilter({
             className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
               !selectedSubCategory
                 ? 'bg-green-600 text-white shadow-md'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                // bg-gray-100 -> dark:bg-gray-800 | text-gray-700 -> dark:text-gray-300
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
             All ({allProducts.length})
@@ -71,7 +72,7 @@ export default function SubCategoryFilter({
                 className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
                   selectedSubCategory === subCat._id
                     ? 'bg-green-600 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
               >
                 {subCat.name} ({count})
