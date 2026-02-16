@@ -29,7 +29,8 @@ export default function Cart() {
     });
       if (!resp.ok) throw new Error('Failed to fetch')
       return await resp.json()
-    }
+    },
+    enabled: !!userToken // لا يتم الجلب إلا إذا وجد التوكن
   })
 
   const deleteMutation = useMutation({
@@ -42,10 +43,7 @@ export default function Cart() {
         toast.success('Item removed from cart');
       }
     },
-    onError: (error) => {
-      console.error("Delete failed:", error);
-      toast.error('Failed to remove item');
-    }
+    onError: () => toast.error('Failed to remove item')
   });
 
   const updateCartMutation = useMutation({
@@ -57,10 +55,7 @@ export default function Cart() {
         queryClient.invalidateQueries({ queryKey: ['get-cart'] });
       }
     },
-    onError: (error) => {
-      console.error("Update failed:", error);
-      toast.error('Failed to update quantity');
-    }
+    onError: () => toast.error('Failed to update quantity')
   });
 
   const couponMutation = useMutation({
@@ -69,16 +64,14 @@ export default function Cart() {
     },
     onSuccess: (result) => {
       if (result.status === 'success') {
-        toast.success('Coupon applied successfully!');
+        toast.success('Coupon applied successfully! ✅');
         queryClient.invalidateQueries({ queryKey: ['get-cart'] });
         setCouponCode('');
       } else {
-        toast.error(result.message || 'Failed to apply coupon');
+        toast.error(result.message || 'Invalid coupon code');
       }
     },
-    onError: (error: any) => {
-      toast.error(error?.message || 'Failed to apply coupon');
-    }
+    onError: (error: any) => toast.error(error?.message || 'Failed to apply coupon')
   });
 
   function handleUpdate(productId: string, count: number) {
@@ -95,232 +88,205 @@ export default function Cart() {
     couponMutation.mutate(couponCode);
   }
 
+  const isCartEmpty = !cartDta || !cartDta.data || !cartDta.data.products || cartDta.data.products.length === 0;
+  const finalPrice = cartDta?.data.totalPriceAfterDiscount || cartDta?.data.totalCartPrice || 0;
+  const hasDiscount = !!(cartDta?.data.totalPriceAfterDiscount && cartDta.data.totalPriceAfterDiscount !== cartDta.data.totalCartPrice);
+  const discountAmount = hasDiscount ? (cartDta?.data.totalCartPrice || 0) - (cartDta?.data.totalPriceAfterDiscount || 0) : 0;
+
   const handleCheckout = () => {
-  if (typeof window !== 'undefined') {
-    sessionStorage.setItem('cartId', cartDta?.data._id || '');
-    sessionStorage.setItem('cartTotal', finalPrice.toString());
-  }
-  router.push('/checkout/step1-address');
-};
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('cartId', cartDta?.data._id || '');
+      sessionStorage.setItem('cartTotal', finalPrice.toString());
+    }
+    router.push('/checkout/step1-address');
+  };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500 dark:border-green-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500 mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400">Loading your cart...</p>
         </div>
       </div>
     )
   }
 
-  const isCartEmpty = !cartDta || !cartDta.data || !cartDta.data.products || cartDta.data.products.length === 0;
-
   if (isError || isCartEmpty) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
-        <div className="text-center py-20">
-          <div className="text-6xl mb-4">🛒</div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-4">
+        <div className="text-center py-10 w-full max-w-md">
+          <div className="text-7xl mb-6">🛒</div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Your Cart is Empty</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">Add some products to get started</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-8">Looks like you haven't added anything to your cart yet.</p>
           <Link 
             href="/" 
-            className="inline-block px-6 py-3 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition-colors font-semibold"
+            className="block w-full sm:inline-block px-8 py-4 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all font-bold shadow-lg"
           >
-            Let's Go Shopping
+            Start Shopping
           </Link>
         </div>
       </div>
     );
   }
 
-  const hasDiscount = cartDta.data.totalPriceAfterDiscount && 
-                      cartDta.data.totalPriceAfterDiscount !== cartDta.data.totalCartPrice;
-  const finalPrice = cartDta.data.totalPriceAfterDiscount || cartDta.data.totalCartPrice;
-  const discountAmount = hasDiscount 
-    ? cartDta.data.totalCartPrice - (cartDta.data.totalPriceAfterDiscount || 0)
-    : 0;
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-6">
-          <Link href="/" className="hover:text-green-600 dark:hover:text-green-500 transition-colors">Home</Link>
-          <span>›</span>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
+      <div className="container mx-auto px-4 py-6 md:py-10 max-w-7xl">
+        
+        {/* Breadcrumb - Hidden on very small screens to save space */}
+        <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-8">
+          <Link href="/" className="hover:text-green-600 transition-colors">Home</Link>
+          <span>/</span>
           <span className="text-gray-900 dark:text-gray-100 font-medium">Shopping Cart</span>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Cart Items */}
+          
+          {/* Left Column: Products List */}
           <div className="lg:col-span-2 space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Shopping Cart</h1>
-              <p className="text-gray-600 dark:text-gray-400">{cartDta.numOfCartItems} items in your cart</p>
-            </div>
+            <header className="mb-6">
+              <h1 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white">Shopping Cart</h1>
+              <p className="text-gray-500 dark:text-gray-400 mt-1">{cartDta.numOfCartItems} items reserved for you</p>
+            </header>
 
             <div className="space-y-4">
               {cartDta.data.products.map((pro) => (
                 <div 
                   key={pro._id} 
-                  className={`flex items-center gap-4 p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 hover:shadow-md dark:hover:shadow-xl transition-all ${
-                    deleteMutation.isPending || updateCartMutation.isPending 
-                      ? 'opacity-50 pointer-events-none' 
-                      : ''
+                  className={`relative flex flex-col sm:flex-row items-center gap-4 p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all ${
+                    deleteMutation.isPending || updateCartMutation.isPending ? 'opacity-50 pointer-events-none' : ''
                   }`}
                 >
-                  <div className="relative w-24 h-24 shrink-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+                  {/* Image Container */}
+                  <div className="w-full sm:w-32 h-40 sm:h-32 shrink-0 bg-gray-50 dark:bg-gray-800 rounded-xl overflow-hidden">
                     <img 
                       src={pro.product.imageCover} 
                       alt={pro.product.title} 
-                      className="w-full h-full object-cover" 
+                      className="w-full h-full object-contain p-2" 
                     />
                   </div>
                   
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-2">{pro.product.title}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {pro.product.category?.name || 'Category'}
+                  {/* Info Container */}
+                  <div className="flex-1 w-full text-center sm:text-left">
+                    <h3 className="font-bold text-gray-900 dark:text-white text-lg line-clamp-1">{pro.product.title}</h3>
+                    <p className="text-sm text-green-600 dark:text-green-500 font-medium mb-3">
+                      {pro.product.category?.name || 'General'}
                     </p>
-                  </div>
-
-                  {/* Quantity Controls */}
-                  <div className="flex items-center gap-3 border border-gray-300 dark:border-gray-700 rounded-lg px-2 py-1 bg-white dark:bg-gray-800">
-                    <button 
-                      onClick={() => handleUpdate(pro.product._id, pro.count - 1)}
-                      disabled={pro.count <= 1 || updateCartMutation.isPending}
-                      className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 w-6 h-6 flex items-center justify-center text-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      −
-                    </button>
                     
-                    <span className="w-8 text-center font-medium text-gray-900 dark:text-gray-100">{pro.count}</span>
-                    
-                    <button 
-                      onClick={() => handleUpdate(pro.product._id, pro.count + 1)}
-                      disabled={updateCartMutation.isPending}
-                      className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 w-6 h-6 flex items-center justify-center text-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      +
-                    </button>
+                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4">
+                      {/* Quantity Controls */}
+                      <div className="flex items-center border-2 border-gray-100 dark:border-gray-800 rounded-xl overflow-hidden bg-gray-50 dark:bg-gray-800">
+                        <button 
+                          onClick={() => handleUpdate(pro.product._id, pro.count - 1)}
+                          className="px-3 py-1 hover:bg-gray-200 dark:hover:bg-gray-700 text-xl font-bold transition-colors"
+                        >−</button>
+                        <span className="px-4 py-1 font-bold text-gray-900 dark:text-white">{pro.count}</span>
+                        <button 
+                          onClick={() => handleUpdate(pro.product._id, pro.count + 1)}
+                          className="px-3 py-1 hover:bg-gray-200 dark:hover:bg-gray-700 text-xl font-bold transition-colors"
+                        >+</button>
+                      </div>
+
+                      <div className="text-lg font-black text-gray-900 dark:text-white">
+                        {pro.price} <span className="text-sm font-normal text-gray-500">EGP</span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="text-right min-w-25">
-                    <div className="font-bold text-gray-900 dark:text-gray-100 text-lg">{pro.price} EGP</div>
-                  </div>
-
+                  {/* Delete Button - Positioned top-right on mobile */}
                   <button 
                     onClick={() => deleteMutation.mutate(pro.product._id)}
-                    disabled={deleteMutation.isPending}
-                    className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-2 text-2xl disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="absolute top-4 right-4 sm:static p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
                   >
-                    <MdDelete />
+                    <MdDelete size={28} />
                   </button>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Order Summary */}
+          {/* Right Column: Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 sticky top-24 space-y-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Order Summary</h2>
+            <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm sticky top-24">
+              <h2 className="text-xl font-black text-gray-900 dark:text-white mb-6">Order Summary</h2>
               
-              {/* Coupon Section */}
-              <div className="border-t border-b border-gray-200 dark:border-gray-800 py-4">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Have a Coupon?</h3>
-                <form onSubmit={handleApplyCoupon} className="flex gap-2">
+              {/* Coupon Form */}
+              <form onSubmit={handleApplyCoupon} className="mb-6">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Have a promo code?</label>
+                <div className="flex gap-2">
                   <input
                     type="text"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                    placeholder="Enter coupon code"
-                    disabled={couponMutation.isPending}
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:cursor-not-allowed text-sm uppercase placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                    placeholder="CODE20"
+                    className="flex-1 px-4 py-3 rounded-xl border-2 border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 focus:border-green-500 outline-none transition-all uppercase font-bold"
                   />
                   <button
                     type="submit"
                     disabled={couponMutation.isPending || !couponCode.trim()}
-                    className="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition-colors font-semibold text-sm disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed whitespace-nowrap"
+                    className="px-6 bg-gray-900 dark:bg-green-700 text-white rounded-xl font-bold hover:bg-black transition-colors disabled:opacity-50"
                   >
-                    {couponMutation.isPending ? (
-                      <span className="flex items-center gap-2">
-                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Applying...
-                      </span>
-                    ) : (
-                      'Apply'
-                    )}
+                    Apply
                   </button>
-                </form>
-                
-                {hasDiscount && (
-                  <div className="mt-3 flex items-center gap-2 text-sm">
-                    <svg className="w-4 h-4 text-green-600 dark:text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-green-600 dark:text-green-500 font-medium">Coupon applied!</span>
-                  </div>
-                )}
-              </div>
+                </div>
+              </form>
 
-              {/* Price Summary */}
-              <div className="space-y-3">
-                <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                  <span>Subtotal ({cartDta.numOfCartItems} items)</span>
-                  <span className="font-medium">{cartDta.data.totalCartPrice} EGP</span>
+              {/* Price Details */}
+              <div className="space-y-4 mb-8">
+                <div className="flex justify-between text-gray-500">
+                  <span>Subtotal</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{cartDta.data.totalCartPrice} EGP</span>
                 </div>
                 
                 {hasDiscount && (
-                  <div className="flex justify-between text-green-600 dark:text-green-500">
-                    <span className="font-medium">Discount</span>
-                    <span className="font-medium">
-                      -{discountAmount.toFixed(2)} EGP
-                    </span>
+                  <div className="flex justify-between text-green-600 bg-green-50 dark:bg-green-900/20 p-2 rounded-lg">
+                    <span>Discount Applied</span>
+                    <span className="font-bold">-{discountAmount.toFixed(2)} EGP</span>
                   </div>
                 )}
                 
-                <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                  <span>Shipping</span>
-                  <span className="font-medium text-green-600 dark:text-green-500">Free</span>
+                <div className="flex justify-between text-gray-500">
+                  <span>Estimated Shipping</span>
+                  <span className="text-green-600 font-bold italic">FREE</span>
                 </div>
-                
-                <div className="border-t border-gray-200 dark:border-gray-800 pt-3">
-                  <div className="flex justify-between text-lg font-bold text-gray-900 dark:text-gray-100">
-                    <span>Total</span>
-                    <span>{finalPrice} EGP</span>
+
+                <div className="pt-4 border-t-2 border-dashed border-gray-100 dark:border-gray-800 flex justify-between items-end">
+                  <span className="text-lg font-bold">Total Amount</span>
+                  <div className="text-right">
+                    {hasDiscount && (
+                      <div className="text-sm text-gray-400 line-through mb-1">{cartDta.data.totalCartPrice} EGP</div>
+                    )}
+                    <div className="text-3xl font-black text-green-600">{finalPrice} EGP</div>
                   </div>
-                  
-                  {hasDiscount && (
-                    <div className="text-right mt-1">
-                      <span className="text-sm text-gray-400 dark:text-gray-500 line-through">
-                        {cartDta.data.totalCartPrice} EGP
-                      </span>
-                    </div>
-                  )}
                 </div>
               </div>
 
-              {/* Checkout Button */}
-              <button 
-                onClick={handleCheckout}
-                className="w-full bg-green-600 dark:bg-green-700 text-white py-3 rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition-colors font-semibold shadow-lg hover:shadow-xl"
-              >
-                Proceed to Checkout
-              </button>
+              {/* Action Buttons */}
+              <div className="space-y-4">
+                <button 
+                  onClick={handleCheckout}
+                  className="w-full bg-green-600 text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-green-500/20 hover:bg-green-700 hover:-translate-y-1 transition-all"
+                >
+                  Proceed to Checkout
+                </button>
+                
+                <Link 
+                  href="/" 
+                  className="block w-full text-center text-gray-500 font-bold hover:text-gray-900 transition-colors"
+                >
+                  Continue Shopping
+                </Link>
+              </div>
 
-              {/* Security Badge */}
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-200 dark:border-gray-800">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                Secure Checkout
+              {/* Trust Badge */}
+              <div className="mt-8 flex items-center justify-center gap-3 text-xs text-gray-400 font-medium">
+                <span className="flex items-center gap-1">🛡️ 100% Secure</span>
+                <span className="flex items-center gap-1">💳 Flexible Payment</span>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
