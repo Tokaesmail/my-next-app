@@ -39,7 +39,7 @@ export default function Register() {
       console.log(responseData)
 
       if (responseData.message=='success') {
-        router.push('../login/page.tsx')
+        router.push('../login')
       }
 
       if (res.ok) {
