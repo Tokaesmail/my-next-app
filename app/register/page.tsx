@@ -2,16 +2,14 @@
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
-import React from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import zod from 'zod'
-import { schemaRegister } from '../schema/SchemaRegister'
-import { toast } from 'react-hot-toast'
 import Image from 'next/image'
-import background from '../../assets/images/trees.jpg'
-import Login from '../login/page'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'react-hot-toast'
+import zod from 'zod'
+import background from '../../assets/images/trees.jpg'
+import { schemaRegister } from '../schema/SchemaRegister'
 
 export default function Register() {
   const router = useRouter();
