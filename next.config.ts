@@ -1,18 +1,18 @@
-//https://ecommerce.routemisr.com/Route-Academy-products/1680403397402-cover.jpeg
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
   images: {
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'ecommerce.routemisr.com',
-        pathname: '/**', 
-      },
+      { protocol: 'https', hostname: 'ecommerce.routemisr.com' },
     ],
+    minimumCacheTTL: 60,
   },
-  
+  compress: true,
+  experimental: {
+    optimizePackageImports: ['react-icons', 'framer-motion', 'lucide-react'],
+  },
+  reactStrictMode: true,
 };
 
 export default nextConfig;

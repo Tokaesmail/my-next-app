@@ -1,6 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
+import Image from 'next/image';
 import { HiShoppingCart, HiArrowRight, HiArrowLeft, HiCube } from 'react-icons/hi';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -33,6 +34,7 @@ interface Props {
 export default function OrderReviewClient({ cartItems, totalPrice, cartId, token }: Props) {
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   const handleContinue = () => {
     if (!cartItems || cartItems.length === 0) {
@@ -51,6 +53,16 @@ export default function OrderReviewClient({ cartItems, totalPrice, cartId, token
 
   const handleBack = () => {
     router.push('/checkout/step1-address');
+  };
+
+  const container = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: shouldReduceMotion ? 0 : 0.08 } },
+  };
+
+  const itemVariant = {
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 20 },
+    show: { opacity: 1, y: 0, transition: { duration: shouldReduceMotion ? 0 : 0.35 } },
   };
 
   return (
@@ -87,52 +99,60 @@ export default function OrderReviewClient({ cartItems, totalPrice, cartId, token
             </div>
           ) : (
             <>
-              {cartItems.map((item, index) => (
-                <motion.div
-                  key={item._id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex items-center gap-4 md:gap-6 p-4 md:p-6 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-purple-200 dark:hover:border-purple-800 hover:shadow-lg transition-all duration-200 bg-linear-to-br from-white to-purple-50/30 dark:from-gray-800 dark:to-purple-950/30"
-                >
-                  <div className="relative group">
-                    <div className="w-20 h-20 md:w-28 md:h-28 rounded-xl overflow-hidden shadow-md group-hover:shadow-xl transition-shadow bg-gray-100 dark:bg-gray-800">
-                      <img
-                        src={item.product.imageCover}
-                        alt={item.product.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
+              <motion.div
+                variants={container}
+                initial="hidden"
+                animate="show"
+                className="space-y-4"
+              >
+                {cartItems.map((item) => (
+                  <motion.div
+                    key={item._id}
+                    variants={itemVariant}
+                    className="flex items-center gap-4 md:gap-6 p-4 md:p-6 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-purple-200 dark:hover:border-purple-800 hover:shadow-lg transition-all duration-200 bg-linear-to-br from-white to-purple-50/30 dark:from-gray-800 dark:to-purple-950/30"
+                  >
+                    <div className="relative group">
+                      <div className="w-20 h-20 md:w-28 md:h-28 rounded-xl overflow-hidden shadow-md group-hover:shadow-xl transition-shadow bg-gray-100 dark:bg-gray-800 relative">
+                        <Image
+                          src={item.product.imageCover}
+                          alt={item.product.title}
+                          fill
+                          loading="lazy"
+                          sizes="(max-width: 768px) 80px, 112px"
+                          className="object-cover group-hover:scale-110 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className="absolute -top-2 -right-2 w-8 h-8 bg-linear-to-br from-indigo-600 to-purple-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
+                        {item.count}
+                      </div>
                     </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-linear-to-br from-indigo-600 to-purple-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
-                      {item.count}
+                    
+                    <div className="flex-1">
+                      <h3 className="font-bold text-gray-900 dark:text-gray-100 text-lg md:text-xl mb-2 line-clamp-2">
+                        {item.product.title}
+                      </h3>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-xs font-semibold">
+                          {item.product.brand?.name}
+                        </span>
+                        <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded-full text-xs font-semibold">
+                          {item.product.category?.name}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Quantity: <span className="font-bold text-gray-900 dark:text-gray-100">{item.count}</span> × 
+                        <span className="font-bold text-indigo-600 dark:text-indigo-400"> {item.price.toFixed(2)} EGP</span>
+                      </p>
                     </div>
-                  </div>
-                  
-                  <div className="flex-1">
-                    <h3 className="font-bold text-gray-900 dark:text-gray-100 text-lg md:text-xl mb-2 line-clamp-2">
-                      {item.product.title}
-                    </h3>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-xs font-semibold">
-                        {item.product.brand?.name}
-                      </span>
-                      <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded-full text-xs font-semibold">
-                        {item.product.category?.name}
-                      </span>
+                    
+                    <div className="text-right">
+                      <p className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-linear-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+                        {(item.price * item.count).toFixed(2)} EGP
+                      </p>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Quantity: <span className="font-bold text-gray-900 dark:text-gray-100">{item.count}</span> × 
-                      <span className="font-bold text-indigo-600 dark:text-indigo-400"> {item.price.toFixed(2)} EGP</span>
-                    </p>
-                  </div>
-                  
-                  <div className="text-right">
-                    <p className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-linear-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
-                      {(item.price * item.count).toFixed(2)} EGP
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))}
+              </motion.div>
 
               <div className="mt-8 bg-linear-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-950/30 dark:via-purple-950/30 dark:to-pink-950/30 p-6 md:p-8 rounded-2xl border-2 border-indigo-100 dark:border-indigo-900">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">Order Summary</h3>

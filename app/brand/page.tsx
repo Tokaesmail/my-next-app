@@ -1,13 +1,18 @@
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { fetchBrands } from '../apiBrand/ApiBrand';
-import BrandsFilter from './BrandsFilter';
+
+const BrandsFilter = dynamic(() => import('./BrandsFilter'), {
+  loading: () => (
+    <div className="h-64 animate-pulse bg-gray-100 dark:bg-gray-800 rounded-xl" />
+  ),
+});
 
 export default async function BrandsPage() {
   const brands = await fetchBrands();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
-      {/* Hero Section */}
       <div className="bg-linear-to-br from-green-50 via-white to-blue-50 dark:from-green-900/20 dark:via-gray-900 dark:to-blue-900/20 border-b dark:border-gray-800">
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
@@ -20,13 +25,11 @@ export default async function BrandsPage() {
         </div>
       </div>
 
-      {/* Featured Brands Section */}
       <div className="container mx-auto px-4 py-12">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Featured Brands</h2>
         <BrandsFilter brands={brands} />
       </div>
 
-      {/* Brand Partner CTA */}
       <div className="bg-linear-to-br from-green-50 to-blue-50 dark:from-green-900/10 dark:to-blue-900/10 mt-12 border-t dark:border-gray-800">
         <div className="container mx-auto px-4 py-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">

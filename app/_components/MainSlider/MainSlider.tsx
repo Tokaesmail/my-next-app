@@ -2,9 +2,6 @@
 import React from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
 
 import img1 from '../../../assets/images/blog-img-1.jpeg'
 import img2 from '../../../assets/images/blog-img-2.jpeg'
@@ -38,18 +35,20 @@ export default function MainSlider() {
                   [&_.swiper-pagination-bullet]:bg-white [&_.swiper-pagination-bullet]:opacity-60"
               >
                 {[img3, img4, img5].map((img, index) => (
-                  <SwiperSlide key={index}>
-                    <div className="relative w-full h-62.5 sm:h-87.5 md:h-112.5 lg:h-112.5">
-                      <Image 
-                        src={img} 
-                        alt={`Slider Image ${index + 1}`} 
-                        fill 
-                        className="object-cover" 
-                        priority={index === 0} 
-                      />
-                    </div>
-                  </SwiperSlide>
-                ))}
+  <SwiperSlide key={index}>
+    <div className="relative w-full h-62.5 sm:h-87.5 md:h-112.5 lg:h-112.5">
+      <Image 
+        src={img} 
+        alt={`Slider Image ${index + 1}`} 
+        fill 
+        className="object-cover" 
+        priority={index === 0}
+        loading={index === 0 ? undefined : 'lazy'}
+        sizes="(max-width: 1024px) 100vw, 75vw"
+      />
+    </div>
+  </SwiperSlide>
+))}
               </Swiper>
             </div>
           </div>
